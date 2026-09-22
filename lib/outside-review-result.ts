@@ -136,7 +136,8 @@ function severityWords(text: string): Severity[] {
   return SEVERITY_LABELS.flatMap(re => [...text.matchAll(re)].map(m => SEVERITY_WORDS[m[1]!.toLowerCase()]!));
 }
 /** An explicit conclusion that the review found nothing to report. */
-const NO_FINDINGS = /\bNO_FINDINGS\b|\bno (?:actionable |significant |new |concrete )?(?:bugs?|issues?|findings?|problems?)\b|\b(?:did not|didn't|cannot|can't|could not|couldn't) (?:find|identify) any (?:actionable |new |concrete )?(?:bugs|issues|findings|problems)\b/i;
+// `codex review` phrases a clean result as "No actionable regressions were identified"; regressions/defects count as no-findings nouns.
+const NO_FINDINGS = /\bNO_FINDINGS\b|\bno (?:actionable |significant |new |concrete )?(?:bugs?|issues?|findings?|problems?|regressions?|defects?)\b|\b(?:did not|didn't|cannot|can't|could not|couldn't) (?:find|identify) any (?:actionable |new |concrete )?(?:bugs|issues|findings|problems|regressions|defects)\b/i;
 
 /** Formatting the requested marker in bold, inline code, or a list does not invalidate a completed review. */
 function plainReview(text: string): string {

@@ -251,6 +251,21 @@ describe('generated outside-review dispatch', () => {
     }
   });
 
+  test('Codex structured review accepts "regressions"/"defects" as an explicit no-findings conclusion', () => {
+    // `codex review` phrases a clean result as "No actionable regressions were identified". The
+    // no-findings regex only knew bugs/issues/findings/problems, so a completed clean review was scored
+    // "missing severity or explicit no-findings conclusion" on wording alone.
+    for (const response of [
+      'No actionable regressions were identified in this diff.',
+      'I did not find any defects in the changed code.',
+      "Didn't identify any concrete regressions.",
+    ]) {
+      expect(validateOutsideReview(response, 'structured')).toEqual({ completed: true, gate: 'pass' });
+    }
+    // Prose with neither a severity tag nor a no-findings noun is still incomplete.
+    expect(validateOutsideReview('Several observations without a severity.', 'structured')).toEqual({ completed: false, reason: 'missing severity or explicit no-findings conclusion' });
+  });
+
   test('INV-1: the generated caller branches on VERDICT: findings complete, untagged is unverified', () => {
     for (const host of ['claude', 'codex'] as const) {
       const findings = invoke(host, { structuredBase: 'main', gate: 'structured' }, { FAKE_RESPONSE: '[P0] Seeded corruption' });
