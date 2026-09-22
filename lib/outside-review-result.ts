@@ -15,7 +15,8 @@ export function validateOutsideReview(text: string, gate: OutsideGate): { comple
   if (gate === 'structured') {
     const plain = plainReview(text);
     const severity = /\[P[0-3]\]|^P[0-3]:/m.test(plain);
-    const clear = /\bNO_FINDINGS\b|\bno (?:actionable |significant |new |concrete )?(?:bugs|issues|findings|problems)\b|\b(?:did not|didn't) (?:find|identify) any (?:actionable |new |concrete )?(?:bugs|issues|findings|problems)\b/i.test(text);
+    // `codex review` phrases a clean result as "No actionable regressions were identified"; regressions/defects count as no-findings nouns.
+    const clear = /\bNO_FINDINGS\b|\bno (?:actionable |significant |new |concrete )?(?:bugs|issues|findings|problems|regressions|defects)\b|\b(?:did not|didn't) (?:find|identify) any (?:actionable |new |concrete )?(?:bugs|issues|findings|problems|regressions|defects)\b/i.test(text);
     if (!severity && !clear) return { completed: false, reason: 'missing severity or explicit no-findings conclusion' };
     return { completed: true, gate: /\[P1\]|^P1:/m.test(plain) ? 'fail' : 'pass' };
   }
